@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/6581e47e-b22a-4b0c-8d78-caf92e587eb5)# Neurodevelopmental-Correlates-of-ADHD-Symptom-Trajectories
+# Neurodevelopmental-Correlates-of-ADHD-Symptom-Trajectories
 We used two population-based cohort (ABCD and IMAGEN) and three independet clinical datasets (ADHD-200, ADHD-1000, and ADHD-Shanghai) to explore the Distinct Neurodevelopmental Correlates of ADHD Symptom Trajectories, and investigated the long-term effects of ADHD medication on ADHD symptom trajectories and multiple functions
 
 RStudio version 4.3.0
