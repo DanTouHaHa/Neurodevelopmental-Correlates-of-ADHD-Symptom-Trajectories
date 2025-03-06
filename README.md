@@ -16,4 +16,6 @@ BiocManger version 3.17
 Python version 3.11.3
 Python package ‘scikit-learn’ (version 1.3.0)
 
+All these packages could be installed quickly on a "normal" desktop computer.
+
 
