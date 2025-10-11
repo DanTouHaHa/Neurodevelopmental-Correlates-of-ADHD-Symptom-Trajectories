@@ -12,6 +12,7 @@ topGO version 2.52.0
 Rgraphviz version 2.44.0
 pathview version 1.40.0
 BiocManger version 3.17
+mFusion
 
 Python version 3.11.3
 Python package ‘scikit-learn’ (version 1.3.0)
