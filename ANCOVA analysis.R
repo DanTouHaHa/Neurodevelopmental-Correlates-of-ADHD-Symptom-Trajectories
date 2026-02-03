@@ -111,57 +111,39 @@ covariate_vars <- names(df_clean)[grepl("^cov", names(df_clean))]
 )
 covariate_vars <- covariate_vars[!covariate_vars %in% variables_to_remove_cov]
 
-# 构建基础公式，包含所有协变量
 base_formula <- paste("Status_Pure_Shaw", paste(covariate_vars, collapse=" + "), sep=" + ")
-# 保存ANOVA的p值
+
 p_values <- numeric(length(response_vars))
-# 对每个因变量进行线性模型拟合和ANOVA检验
+
 for (i in seq_along(response_vars)) {
-  # 构建完整公式，加入当前的因变量
+  
   formula <- as.formula(paste(response_vars[i], "~", base_formula))
-  # 拟合模型
-  model <- lm(formula, data = df_clean)
-  # 进行ANOVA检验
+  model   <- lm(formula, data = df_clean)
+  
   anova_result <- anova(model)
-  # 获取group变量的ANOVA p值
   group_anova_pval <- anova_result["Status_Pure_Shaw", "Pr(>F)"]
-  p_values[[i]] <- group_anova_pval
-  # 如果group变量不存在于ANOVA表中，说明模型可能存在问题
-  #if (is.na(group_anova_pval)) {
-  #  warning(paste("无法计算ANOVA p值，检查模型：", response_vars[i]))
-  #  p_values[i] <- NA
-  #} else {
-  #  p_values[i] <- group_anova_pval
-  #}
+  
+  p_values[i] <- group_anova_pval
 }
 
-# 对p值进行FDR校正
-# 对那些显著的因变量进行Tukey HSD事后检验
 p_adjusted <- p.adjust(p_values, method = "fdr")
-# 对每个显著的因变量进行Tukey HSD事后检验
-tukey_results <- list()
-for (i in which(p_adjusted < 1)) {
-  # 构建完整公式，加入当前显著的因变量
+
+#事后检验
+library(emmeans)
+emmeans_results <- list()
+
+sig_idx <- which(p_adjusted < 1 & !is.na(p_adjusted))  
+
+for (i in sig_idx) {
   formula <- as.formula(paste(response_vars[i], "~", base_formula))
-  # 拟合模型
-  model <- aov(formula, data = df_clean)
-  # Tukey HSD事后检验
-  tukey <- TukeyHSD(model, "Status_Pure_Shaw")
-  # 将结果存储在列表中
-  tukey_results[[response_vars[i]]] <- tukey
-  # 打印结果
-  #print(paste(response_vars[i], "的Tukey HSD事后检验:"))
-  print(tukey_results)
+  model   <- lm(formula, data = df_clean)
+  emm      <- emmeans(model, ~ Status_Pure_Shaw)
+  pair_res <- pairs(emm, adjust = "tukey")
+  emmeans_results[[response_vars[i]]] <- as.data.frame(pair_res)
 }
-# 如果每个列表元素都可以被转换为一个向量，您可以这样操作
-my_list <- lapply(tukey_results, unlist)
-# 然后尝试将其转换为tibble
-output <- tibble::as_tibble(my_list)
-output_row_names <- c("3-0diff", "1-0diff", "2-0diff", "1-3diff", "2-3diff", "2-1diff", 
-                      "3-0lwr", "1-0lwr", "2-0lwr", "1-3lwr", "2-3lwr", "2-1lwr", 
-                      "3-0upr", "1-0upr", "2-0upr", "1-3upr", "2-3upr", "2-1upr", 
-                      "3-0padj", "1-0padj", "2-0padj","1-3padj", "2-3padj", "2-1padj")
-rownames(output) <- output_row_names
-output <- t(output)
-output <- as.data.frame(output)
+
+#输出
+my_list <- lapply(emmeans_results, unlist)
+output  <- tibble::as_tibble(my_list)
+output  <- as.data.frame(t(output))
 
