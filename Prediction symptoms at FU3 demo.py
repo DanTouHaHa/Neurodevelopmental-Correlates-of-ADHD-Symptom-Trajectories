@@ -59,7 +59,7 @@ data_Y=data["ADHD_Inattention_FU3"]  # 设置Y变量 ADHD_Total_FU3  ADHD_Inatte
 
 
 result=pd.DataFrame()
-
+#计算R^2，后续还需要使用配对t检验
 for i in range(200):
     X_train_list, Y_train_list, X_test_list, Y_test_list, \
     XLess_train_list, XLess_test_list = fold5(
