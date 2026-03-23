@@ -1,8 +1,9 @@
-#### linear regression ##### Python
+#### SVR regression ##### Python
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
 from scipy.stats import pearsonr
 #随机抽样200次，每次5折，产生1000个r
 from sklearn.svm import SVR
@@ -72,12 +73,20 @@ for i in range(200):
         XLess_train_list, XLess_test_list
     ):
         # ===== CLBM =====
+        scaler_clbm = StandardScaler()
+        x_train_std = scaler_clbm.fit_transform(x_train)
+        x_test_std  = scaler_clbm.transform(x_test)
+        
         reg = SVR(kernel='linear')
         reg.fit(x_train, y_train)
         y_pred = reg.predict(x_test)
         R2 = r2_score(y_test, y_pred)
 
         # ===== CBBM =====
+        scaler_cbbm = StandardScaler()
+        xLess_train_std = scaler_cbbm.fit_transform(xLess_train)
+        xLess_test_std  = scaler_cbbm.transform(xLess_test)
+        
         regLess = SVR(kernel='linear')
         regLess.fit(xLess_train, y_train)
         y_predLess = regLess.predict(xLess_test)
